@@ -35,6 +35,31 @@ The original raw DataFrame contains 1534 rows, corresponding to 1534 outages, an
 |`PC.REALGSP.CHANGE`                |Percentage change of per capita real GSP from the previous year (in %)|
 
 # Data Cleaning and Exploratory Data Analysis
+The first step is to clean the data to make sure it is suitable for effective analysis. 
+## Data Cleaning
+1. For cleaning my data I first converted all the columns to the correct data types, as I found that most were stored as string objects when they truly represented numeric values, such as `ANOMALY.LEVEL`, `OUTAGE.DURATION`, `DEMAND.LOSS.MW`. 
+2. Next, I combined the `OUTAGE.START.DATE` and `OUTAGE.START.TIME` columns into one Timestamp object in an `OUTAGE.START` column. I did the same for `OUTAGE.RESTORATION.DATE` and `OUTAGE.RESTORATION.TIME`.
+3. I then checked that `ANOMALY.LEVEL` and `CLIMATE.CATEGORY` were in agreement as these columns were most likely going to be important for my analysis later. In this dataset, anomaly levels below `-0.5` should correspond to `"cold"`, levels above `0.5`should correspond to `"warm"`, and values in between should correspond to `"normal"`.
+4. Finally, I cleaned the `OUTAGE.DURATION` column by treating outages recorded as `0` or `1` minute as missing values. In the context of major power outages, these entries are likely recording issues rather than meaningful durations, so replacing them with `NaN` better reflects the data generating process.
+
+The first few rows of this cleaned DataFrame are shown below, with a portion of columns selected.
+|   YEAR |   MONTH | STATE     | CLIMATE.REGION     |   ANOMALY.LEVEL | CLIMATE.CATEGORY   | CAUSE.CATEGORY     |   OUTAGE.DURATION | OUTAGE.START        |
+|-------:|--------:|:----------|:-------------------|----------------:|:-------------------|:-------------------|------------------:|:--------------------|
+|   2011 |       7 | Minnesota | East North Central |            -0.3 | normal             | severe weather     |              3060 | 2011-07-01 17:00:00 |
+|   2014 |       5 | Minnesota | East North Central |            -0.1 | normal             | intentional attack |               nan | 2014-05-11 18:38:00 |
+|   2010 |      10 | Minnesota | East North Central |            -1.5 | cold               | severe weather     |              3000 | 2010-10-26 20:00:00 |
+|   2012 |       6 | Minnesota | East North Central |            -0.1 | normal             | severe weather     |              2550 | 2012-06-19 04:30:00 |
+|   2015 |       7 | Minnesota | East North Central |             1.2 | warm               | severe weather     |              1740 | 2015-07-18 02:00:00 |
+
+## Expolratory Data Analysis
+
+### Univariate Analysis
+In my exploratory data analysis, I first perform univariate analysis to examine the distribution of single variables.
+
+First, I created a `plotly` histogram to see the distribution of outage causes using the `CAUSE.CATEGORY` column
+
+The plot shows that **severe weather** was by far the most common cause of major outages, followed by intentional attack. This suggests that extreme weather is the dominant driver of large outage events in the dataset.
+
 
 # Assessment of Missingness
 
