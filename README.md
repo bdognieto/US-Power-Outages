@@ -200,8 +200,111 @@ The response variabe for the model (column we are predicting) will be `CUSTOMERS
 
 The evaluation metric we will be using for the model will be **R² (coefficient of determination)**. I choose this metric because it helps us compare models easily and provides an intuitive measure of model performance.
 
+Lastly, I will only be utilizing 5 varibales from the dataset in my models: `MONTH`, `CLIMATE.REGION`, `ANOMALY.LEVEL`, `CAUSE.CATEGORY`, and `POPDEN_URBAN`
+
 # Baseline Model
+I first needed to fill in the missing values for the variables we will be using:
+- Filled in missing `CUSTOMERS.AFFECTED` with **probalistic imputation conditional on cause category**. I chose to do this because we already decided customer missingness is dependent on outage cause (MAR), and cause category has no missing values
+- For the other columns there were only a couple missing values so I imputed with their medians in order to preserve their shape. 
+
+To establish a baseline, I trained a **linear regression model** to predict `CUSTOMERS.AFFECTED`, the number of customers affected by a major power outage.
+
+The model used three features:
+- `POPDEN_URBAN` (quantitative)
+- `ANOMALY.LEVEL` (quantitative)
+- `CAUSE.CATEGORY` (nominal categorical)
+
+Because `CAUSE.CATEGORY` is categorical, it was tranformed using **one-hot encoding**. The two quantitative variables, `POPDEN_URBAN` and `ANOMALY.LEVEL`, were **standardized** using StandardScaler. These preprocessing steps and the regression model were combined in a single **scikit-learn Pipeline**.
+
+After fitting the baseling model to our training data, it achieved an **R² score of approximately 0.126** on our held-out test set. 
+
+This means the baseline model explains only about 12.6% of the variability in the number of customers affected. While this provides a useful starting point, the model is not especially strong. This is likely because outage severity depends on more complex relationships than a simple linear model with only three features can capture. The baseline model therefore serves mainly as a benchmark for later improvement.
 
 # Final Model 
+## Model Improvements Over Baseline
+To improve the baseline model, I made the following key changes:
+1. Changed the response variable to `log_customers`
+	- This reduces skew in `CUSTOMERS.AFFECTED`
+	- Makes the model easier to fit and improves performance
+2. Added additional features
+	- `MONTH` (categorical)
+	- `CLIMATE.REGION` (categorical)
+3. Introduced feature engineering
+	- Used PolynomialFeatures to allow the model to capture nonlinear relationships
+
+## Final Features Used
+After testing different feature combinations using **cross-validation**, I selected the following features:
+- `POPDEN_URBAN` (quantitative)
+- `ANOMALY.LEVEL` (quantitative)
+- `CAUSE.CATEGORY` (nominal categorical)
+
+Although additional features like `MONTH` and `CLIMATE.REGION` were explored, they did not significantly improve performance and were excluded to avoid unnecessary complexity.
+
+| Validation Fold   |   num only |   num + cause |   num only + cause + region |   num only + cause + region + month |
+|:------------------|-----------:|--------------:|----------------------------:|------------------------------------:|
+| Fold 1            |    5.2347  |       2.28262 |                     2.28714 |                             2.25394 |
+| Fold 2            |    5.40029 |       2.14772 |                     2.15172 |                             2.14767 |
+| Fold 3            |    5.37066 |       2.09978 |                     2.10149 |                             2.13421 |
+| Fold 4            |    5.37253 |       2.22541 |                     2.22804 |                             2.20714 |
+| Fold 5            |    5.40759 |       1.99595 |                     1.99866 |                             1.98007 |
+
+## Feature Transformations
+All transormations were implemented within a single **scikit-learn Pipeline**
+- Numerical features were standardized using **StandardScaler**
+- Categorical features were encoded using **OneHotEncoder (drop='first')**
+- Polynomial features were generated using **PolynomialFeatures**
+
+## Model and Hyperparameter Tuning
+The final model is a **Linear Regression model** with polynomial feature expansion.
+
+I performed **GridSearchCV with 5-fold cross-validation** to tune hyperparameters:
+- `poly__degree`: [1, 2, 3]
+- `model__fit_intercept`: [True, False]
+
+The grid search selected:
+- Best degree: 1
+- Best intercept setting: True
+
+This indicates that adding higher-degree polynomial features did not improve performance, suggesting that the relationships are largely linear.
+
+## Model Performance
+
+**Final Test R² Score: ≈ 0.82**
+
+This is a substantial improvement over the baseline model (R² ≈ 0.126). The improvement is mainly due to using a log-transformed response variable, which stabilizes variance
+
 
 # Fairness Analysis
+To evaluate fairness, I compared my model performance across two groups:
+- **Group X (Severe)**: outages caused by *severe weather*
+- **Group Y (Non-Severe)**: outages caused by all other categories
+
+The evaluation metric I used was RMSE (root mean squared error)
+
+The test statistic is the difference in RMSE between the two groups:
+- RMSE(severe) - RMSE(non-severe)
+- A positive value would indicate worse performance on severe outages, while a negative value indicates worse performance on non-severe outages
+
+**Null Hypothesis:** Our model is fair and performs equally well on severe-weather and non-severe-weather outages, and any differences are due to random chance.
+**Alternative Hypothesis:** Our model is unfair and performs worse for severe-weather outages than for non-severe-weather outages.
+
+I then performed a permutation test with a chosen significance level of α=0.05:
+1. Computed predictions on the test set
+2. Split the data into severe and non-severe groups
+3. Calculated the observed difference in RMSE
+4. Randomly shuffled group labels many times (1000 permutations)
+5. Recomputed the RMSE difference for each permutation
+6. Calculated the p-value as the proportion of simulated differences greater than or equal to the observed difference
+
+Below is the empirical distribution:
+<iframe
+  src="assets/fair_emp.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+
+Since the p-value is much greater than 0.05 (~0.8), **we fail to reject the null hypothesis**.
+
+This suggests that there is no statistically significant difference in model performance between severe and non-severe outages. In other words, the model appears to perform **similarly across both groups**, indicating no strong evidence of unfairness with respect to outage cause.
+
