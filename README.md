@@ -4,13 +4,13 @@ Final project for DSC 80 at UCSD
 By: Brandon Nieto
 
 # Introduction
-In this project, I analyzed the major power outages that occured in the United States from January 2000-July 2016. The Data was fetched from Purdue University’s research data (https://engineering.purdue.edu/LASCI/research-data/outages). Acording to the Department of Energy, the major outages in this data refer to those that impacted at least 50,000 customers or caused an unplanned firm load loss of at least 300MW. The data set also provides information on geographical location of the outages, date and time of the outages, regional climatic information, land-use characteristics, electricity consumption patterns and economic characteristics of the states affected by the outages. 
+In this project, I analyzed the major power outages that occurred in the United States from January 2000-July 2016. The data was fetched from Purdue University’s research data (https://engineering.purdue.edu/LASCI/research-data/outages). According to the Department of Energy, the major outages in this data refer to those that impacted at least 50,000 customers or caused an unplanned firm load loss of at least 300MW. The dataset also provides information on geographical location of the outages, date and time of the outages, regional climatic information, land-use characteristics, electricity consumption patterns and economic characteristics of the states affected by the outages. 
 
-The initial research question I chose to center my project around: what are the main causes of the major power outages and what are their associated characteristics? 
+The initial research question I chose to center my project around is: what are the main causes of the major power outages and what are their associated characteristics? 
 
 Power outages can have serious economic and social consequences, affecting millions of people each year. By analyzing the causes of major outages and their associated characteristics, we can better understand what drives outage severity and identify patterns that may help improve infrastructure resilience. This is particularly important as extreme weather events become more frequent, making it critical to understand how different causes contribute to large-scale outages.
 
-The original raw DataFrame contains 1534 rows, corresponding to 1534 outages, and 57 columns. However, I will only focus on a few of these columns for the sake of my analysis.
+The original raw dataset contains 1534 rows, corresponding to 1534 outages, and 57 columns. However, I will only focus on a few of these columns for the sake of my analysis.
 |Column                |Description|
 |---                |---        |
 |`'YEAR'`                |Year an outage occurred|
@@ -36,10 +36,11 @@ The original raw DataFrame contains 1534 rows, corresponding to 1534 outages, an
 
 # Data Cleaning and Exploratory Data Analysis
 The first step is to clean the data to make sure it is suitable for effective analysis. 
+
 ## Data Cleaning
 1. For cleaning my data I first converted all the columns to the correct data types, as I found that most were stored as string objects when they truly represented numeric values, such as `ANOMALY.LEVEL`, `OUTAGE.DURATION`, `DEMAND.LOSS.MW`. 
 2. Next, I combined the `OUTAGE.START.DATE` and `OUTAGE.START.TIME` columns into one Timestamp object in an `OUTAGE.START` column. I did the same for `OUTAGE.RESTORATION.DATE` and `OUTAGE.RESTORATION.TIME`.
-3. I then checked that `ANOMALY.LEVEL` and `CLIMATE.CATEGORY` were in agreement as these columns were most likely going to be important for my analysis later. In this dataset, anomaly levels below `-0.5` should correspond to `"cold"`, levels above `0.5`should correspond to `"warm"`, and values in between should correspond to `"normal"`.
+3. I then checked that `ANOMALY.LEVEL` and `CLIMATE.CATEGORY` were in agreement as these columns were most likely going to be important for my analysis later. In this dataset, anomaly levels below `-0.5` should correspond to `"cold"`, levels above `0.5` should correspond to `"warm"`, and values in between should correspond to `"normal"`.
 4. Finally, I cleaned the `OUTAGE.DURATION` column by treating outages recorded as `0` or `1` minute as missing values. In the context of major power outages, these entries are likely recording issues rather than meaningful durations, so replacing them with `NaN` better reflects the data generating process.
 
 The first few rows of this cleaned DataFrame are shown below, with a portion of columns selected.
@@ -51,7 +52,7 @@ The first few rows of this cleaned DataFrame are shown below, with a portion of 
 |   2012 |       6 | Minnesota | East North Central |            -0.1 | normal             | severe weather     |              2550 | 2012-06-19 04:30:00 |
 |   2015 |       7 | Minnesota | East North Central |             1.2 | warm               | severe weather     |              1740 | 2015-07-18 02:00:00 |
 
-## Expolratory Data Analysis
+## Exploratory Data Analysis
 
 ### Univariate Analysis
 In my exploratory data analysis, I first perform univariate analysis to examine the distribution of single variables.
@@ -113,7 +114,7 @@ This table shows that **system operability disruption** tends to affect more cus
 For the 1534 rows and 57 columns, this dataset contained a lot of missing `NaN` values that I would need to assess. While a column like `HURRICANE.NAMES` can be interpreted as Missing by Design, many other columns seemed to be Missing Not at Random (MNAR).
 
 ## MNAR Analysis
-I wantd to specifically focus on `CUSTOMERS.AFFECTED`, which has about 29 percent of its entries missing, since I will be using it in my prediction model and will want to impute its missing values.
+I wanted to specifically focus on `CUSTOMERS.AFFECTED`, which has about 29 percent of its entries missing, since I will be using it in my prediction model and will want to impute its missing values.
 
 It is plausible that this column is **MNAR**, since the likelihood of missing data may depend on the value itself. For example, outages affecting extremely large or extremely small numbers of customers may be more difficult to accurately record, leading to missing entries. Additionally, reporting practices may vary across utility companies or regions, further contributing to missingness that depends on the unobserved value.
 
@@ -129,7 +130,7 @@ I then performed permutation tests to determine whether the missingness depends 
 ### Dependent Relationship
 I found that the missingness of `CUSTOMERS.AFFECTED` **depends on** the variable `CAUSE.CATEGORY`
 
-I first plotted the distribution of outage cuases based on `customer_missing` using a horizontal bar chart
+I first plotted the distribution of outage causes based on `customer_missing` using a horizontal bar chart
 <iframe
   src="assets/cause_missing.html"
   width="800"
@@ -147,10 +148,10 @@ This difference was quantified using the **Total Variation Distance (TVD)** and 
 ></iframe>
 I calculated a following p-value of 0.0
 
-These findings suggests the missingness is dependent of `CAUSE.CATEGORY` (likely **MAR**).
+These findings suggest the missingness is dependent of `CAUSE.CATEGORY` (likely **MAR**).
 
 ### Independent Relationship
-I found that missingnes of customers affected depended on many variables in the dataset unitl I tested `PC.REALGSP.CHANGE`.
+I found that missingness of customers affected depended on many variables in the dataset until I tested `PC.REALGSP.CHANGE`.
 
 First I created a **kernel density** plot since GSP change is a numerical variable
 <iframe
@@ -161,7 +162,7 @@ First I created a **kernel density** plot since GSP change is a numerical variab
 ></iframe>
 The distributions of percent change in real GSP for missing and non-missing groups largely overlap, indicating no meaningful difference between them.
 
-For the permutation test, I used a **Kolmogorov-Smirnov test** instead of difference of absolute means which would've given an unaccurate representation of the distribution plotted above. I obtained a **large p-value**(0.28), indicating no statistically significant difference between the distributions.
+For the permutation test, I used a **Kolmogorov-Smirnov test** instead of difference of absolute means which would've given an inaccurate representation of the distribution plotted above. I obtained a **large p-value**(0.28), indicating no statistically significant difference between the distributions.
 
 This suggests that missingness is independent of this variable
 
@@ -181,9 +182,9 @@ I will be testing whether the outage cause of **severe weather** affects more cu
 
 **Significance Level:** α = 0.05
 
-I performed a permutation test with 500 simulations in order to generate an empirical distribution of the test statisic under the null hypothesis.
+I performed a permutation test with 500 simulations in order to generate an empirical distribution of the test statistic under the null hypothesis.
 
-The p-value I got was 0.0, so with a standard significance level of 0.05, we reject the null hypothesis because the results are statistically significant. We conclude that on average, a power outage caused by severe weather will most likely affect more customers.
+The p-value I got was 0.0, so with a standard significance level of 0.05, we reject the null hypothesis because the results are statistically significant. We conclude that on average, a power outage caused by severe weather will tend to affect more customers.
 
 The plot below shows the observed difference against the empirical distribution of differences from the permutation tests.
 <iframe
@@ -196,15 +197,15 @@ The plot below shows the observed difference against the empirical distribution 
 # Framing a Prediction Problem
 The model I will create will attempt to predict the severity (in terms of **number of customers**) of a major power outage. This will be a linear regression model since we are predicting a continuous numerical value.
 
-The response variabe for the model (column we are predicting) will be `CUSTOMERS.AFFECTED`. I chose this variable to measure severity compared to it's alternatives, `OUTAGE.DURATION` and `DEMAND.LOSS.MW`, because the data entries it contains are more reliable and we already assesed it's missingness. 
+The response variable for the model (column we are predicting) will be `CUSTOMERS.AFFECTED`. I chose this variable to measure severity compared to its alternatives, `OUTAGE.DURATION` and `DEMAND.LOSS.MW`, because the data entries it contains are more reliable and we already assessed it's missingness. 
 
-The evaluation metric we will be using for the model will be **R² (coefficient of determination)**. I choose this metric because it helps us compare models easily and provides an intuitive measure of model performance.
+The evaluation metric we will be using for the model will be **R² (coefficient of determination)**. I chose this metric because it helps us compare models easily and provides an intuitive measure of model performance.
 
-Lastly, I will only be utilizing 5 varibales from the dataset in my models: `MONTH`, `CLIMATE.REGION`, `ANOMALY.LEVEL`, `CAUSE.CATEGORY`, and `POPDEN_URBAN`
+Lastly, I will only be utilizing 5 variables from the dataset in my models: `MONTH`, `CLIMATE.REGION`, `ANOMALY.LEVEL`, `CAUSE.CATEGORY`, and `POPDEN_URBAN`
 
 # Baseline Model
 I first needed to fill in the missing values for the variables we will be using:
-- Filled in missing `CUSTOMERS.AFFECTED` with **probalistic imputation conditional on cause category**. I chose to do this because we already decided customer missingness is dependent on outage cause (MAR), and cause category has no missing values
+- Filled in missing `CUSTOMERS.AFFECTED` with **probabilistic imputation conditional on cause category**. I chose to do this because we already decided customer missingness is dependent on outage cause (MAR), and cause category has no missing values
 - For the other columns there were only a couple missing values so I imputed with their medians in order to preserve their shape. 
 
 To establish a baseline, I trained a **linear regression model** to predict `CUSTOMERS.AFFECTED`, the number of customers affected by a major power outage.
@@ -214,9 +215,9 @@ The model used three features:
 - `ANOMALY.LEVEL` (quantitative)
 - `CAUSE.CATEGORY` (nominal categorical)
 
-Because `CAUSE.CATEGORY` is categorical, it was tranformed using **one-hot encoding**. The two quantitative variables, `POPDEN_URBAN` and `ANOMALY.LEVEL`, were **standardized** using StandardScaler. These preprocessing steps and the regression model were combined in a single **scikit-learn Pipeline**.
+Because `CAUSE.CATEGORY` is categorical, it was transformed using **one-hot encoding**. The two quantitative variables, `POPDEN_URBAN` and `ANOMALY.LEVEL`, were **standardized** using StandardScaler. These preprocessing steps and the regression model were combined in a single **scikit-learn Pipeline**.
 
-After fitting the baseling model to our training data, it achieved an **R² score of approximately 0.126** on our held-out test set. 
+After fitting the baseline model to our training data, it achieved an **R² score of approximately 0.126** on our held-out test set. 
 
 This means the baseline model explains only about 12.6% of the variability in the number of customers affected. While this provides a useful starting point, the model is not especially strong. This is likely because outage severity depends on more complex relationships than a simple linear model with only three features can capture. The baseline model therefore serves mainly as a benchmark for later improvement.
 
@@ -249,7 +250,7 @@ Although additional features like `MONTH` and `CLIMATE.REGION` were explored, th
 | Fold 5            |    5.40759 |       1.99595 |                     1.99866 |                             1.98007 |
 
 ## Feature Transformations
-All transormations were implemented within a single **scikit-learn Pipeline**
+All transformations were implemented within a single **scikit-learn Pipeline**
 - Numerical features were standardized using **StandardScaler**
 - Categorical features were encoded using **OneHotEncoder (drop='first')**
 - Polynomial features were generated using **PolynomialFeatures**
@@ -275,7 +276,7 @@ This is a substantial improvement over the baseline model (R² ≈ 0.126). The i
 
 
 # Fairness Analysis
-To evaluate fairness, I compared my model performance across two groups:
+To evaluate fairness, I compared model performance across two groups:
 - **Group X (Severe)**: outages caused by *severe weather*
 - **Group Y (Non-Severe)**: outages caused by all other categories
 
