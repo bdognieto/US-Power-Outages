@@ -4,6 +4,7 @@ Power outages impact millions of people every year, disrupting homes, businesses
 In this project, I analyze major power outages across the United States to uncover the key drivers behind these events and better understand the factors that influence their impact.
 
 By: Brandon Nieto
+
 *My DSC80 final project exploring outage causes, severity, and predictive modeling.*
 
 # Introduction
