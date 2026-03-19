@@ -1,7 +1,10 @@
-# US Power Outages
-Final project for DSC 80 at UCSD
+# Understanding Major U.S. Power Outages Through Data
+Power outages impact millions of people every year, disrupting homes, businesses, and critical infrastructure. But what actually causes the largest outages—and what makes some of them more severe than others?
+
+In this project, I analyze major power outages across the United States to uncover the key drivers behind these events and better understand the factors that influence their impact.
 
 By: Brandon Nieto
+*My DSC80 final project exploring outage causes, severity, and predictive modeling.*
 
 # Introduction
 In this project, I analyzed the major power outages that occurred in the United States from January 2000-July 2016. The data was fetched from Purdue University’s research data (https://engineering.purdue.edu/LASCI/research-data/outages). According to the Department of Energy, the major outages in this data refer to those that impacted at least 50,000 customers or caused an unplanned firm load loss of at least 300MW. The dataset also provides information on geographical location of the outages, date and time of the outages, regional climatic information, land-use characteristics, electricity consumption patterns and economic characteristics of the states affected by the outages. 
