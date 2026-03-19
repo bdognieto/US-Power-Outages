@@ -106,6 +106,7 @@ I also summarized outage severity by cause category using grouped tables. One in
 | islanding                     |      34 |   6169.09     |   2342.5 |  48400           |
 | intentional attack            |     199 |   1790.53     |      0   | 125000           |
 | fuel supply emergency         |       7 |      0.142857 |      0   |      1           |
+
 This table shows that **system operability disruption** tends to affect more customers on average, however **severe weather** is more impactful as it is significantly more common and around the same severity. 
 
 # Assessment of Missingness
