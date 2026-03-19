@@ -15,6 +15,7 @@ The initial research question I chose to center my project around is: what are t
 Power outages can have serious economic and social consequences, affecting millions of people each year. By analyzing the causes of major outages and their associated characteristics, we can better understand what drives outage severity and identify patterns that may help improve infrastructure resilience. This is particularly important as extreme weather events become more frequent, making it critical to understand how different causes contribute to large-scale outages.
 
 The original raw dataset contains 1534 rows, corresponding to 1534 outages, and 57 columns. However, I will only focus on a few of these columns for the sake of my analysis.
+
 |Column                |Description|
 |---                |---        |
 |`'YEAR'`                |Year an outage occurred|
@@ -48,6 +49,7 @@ The first step is to clean the data to make sure it is suitable for effective an
 4. Finally, I cleaned the `OUTAGE.DURATION` column by treating outages recorded as `0` or `1` minute as missing values. In the context of major power outages, these entries are likely recording issues rather than meaningful durations, so replacing them with `NaN` better reflects the data generating process.
 
 The first few rows of this cleaned DataFrame are shown below, with a portion of columns selected.
+
 |   YEAR |   MONTH | STATE     | CLIMATE.REGION     |   ANOMALY.LEVEL | CLIMATE.CATEGORY   | CAUSE.CATEGORY     |   OUTAGE.DURATION | OUTAGE.START        |
 |-------:|--------:|:----------|:-------------------|----------------:|:-------------------|:-------------------|------------------:|:--------------------|
 |   2011 |       7 | Minnesota | East North Central |            -0.3 | normal             | severe weather     |              3060 | 2011-07-01 17:00:00 |
@@ -64,8 +66,8 @@ In my exploratory data analysis, I first perform univariate analysis to examine 
 First, I created a `plotly` histogram to see the distribution of outage causes using the `CAUSE.CATEGORY` column
 <iframe
   src="assets/cause_dist.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 The plot shows that **severe weather** was by far the most common cause of major outages, followed by intentional attack. This suggests that extreme weather is the dominant driver of large outage events in the dataset.
@@ -73,8 +75,8 @@ The plot shows that **severe weather** was by far the most common cause of major
 Then, I also created a `plotly` barchart to see the distribution of the total number of outages by month across all years.
 <iframe
   src="assets/month_dist.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 This plot shows that outages were most common in the **summer months**, especially around June through August, which may reflect the impact of storms, heat-related failures, and seasonal demand stress on the grid.
@@ -85,8 +87,8 @@ I also conducted several bivariate analyses; A couple are shown below
 I first wanted to see the relation between `OUTAGE.DURATION` and `CUSTOMERS.AFFECTED` by creating a `plotly` scatterplot
 <iframe
   src="assets/customer_duration.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 This plot shows a **positive relationship**: in general, outages that last longer tend to affect more customers. While the plot contains several extreme outliers, the overall upward trend suggests that outage scale and outage duration are related
@@ -94,14 +96,15 @@ This plot shows a **positive relationship**: in general, outages that last longe
 I also created a `plotly` box plot of `CAUSE.CATEGORY` versus `OUTAGE.DURATION`, using a log-scaled y-axis to make the comparison easier to interpret.
 <iframe
   src="assets/duration_cause.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 This plot shows that **fuel supply emergencies** and **severe weather** tend to be associated with longer outage durations than most other causes of power outages.
 
 ### Interesting Aggregates
 I also summarized outage severity by cause category using grouped tables. One informative table I created was grouped by `CAUSE.CATEGORY` and calculated the count, mean, median, and maximum of `CUSTOMERS.AFFECTED`.
+
 | CAUSE.CATEGORY                |   count |          mean |   median |              max |
 |:------------------------------|--------:|--------------:|---------:|-----------------:|
 | system operability disruption |      83 | 211066        |  69000   |      3.12535e+06 |
@@ -137,8 +140,8 @@ I found that the missingness of `CUSTOMERS.AFFECTED` **depends on** the variable
 I first plotted the distribution of outage causes based on `customer_missing` using a horizontal bar chart
 <iframe
   src="assets/cause_missing.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 This plot shows that the distribution of outage causes differs between missing and non-missing observations. Notably, severe weather events are much more common when customer data is recorded, while other causes appear more frequently when values are missing.
@@ -146,8 +149,8 @@ This plot shows that the distribution of outage causes differs between missing a
 This difference was quantified using the **Total Variation Distance (TVD)** and confirmed with a permutation test, where the observed statistic was far from the null distribution.
 <iframe
   src="assets/dependent_tvd.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 I calculated a following p-value of 0.0
@@ -160,8 +163,8 @@ I found that missingness of customers affected depended on many variables in the
 First I created a **kernel density** plot since GSP change is a numerical variable
 <iframe
   src="assets/kde_gsp.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 The distributions of percent change in real GSP for missing and non-missing groups largely overlap, indicating no meaningful difference between them.
@@ -193,8 +196,8 @@ The p-value I got was 0.0, so with a standard significance level of 0.05, we rej
 The plot below shows the observed difference against the empirical distribution of differences from the permutation tests.
 <iframe
   src="assets/hyp_test.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -304,8 +307,8 @@ I then performed a permutation test with a chosen significance level of α=0.05:
 Below is the empirical distribution:
 <iframe
   src="assets/fair_emp.html"
-  width="800"
-  height="600"
+  width="600"
+  height="400"
   frameborder="0"
 ></iframe>
 
