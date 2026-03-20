@@ -8,7 +8,7 @@ By: Brandon Nieto
 *My DSC80 final project exploring outage causes, severity, and predictive modeling.*
 
 # Introduction
-In this project, I analyzed the major power outages that occurred in the United States from January 2000-July 2016. The data was fetched from Purdue University’s research data (https://engineering.purdue.edu/LASCI/research-data/outages). According to the Department of Energy, the major outages in this data refer to those that impacted at least 50,000 customers or caused an unplanned firm load loss of at least 300MW. The dataset also provides information on geographical location of the outages, date and time of the outages, regional climatic information, land-use characteristics, electricity consumption patterns and economic characteristics of the states affected by the outages. 
+In this project, I analyzed the major power outages that occurred in the United States from January 2000-July 2016. The data was fetched from Purdue University’s research data (https://engineering.purdue.edu/LASCI/research-data/outages). According to the Department of Energy, the major outages in this dataset refer to those that impacted at least 50,000 customers or caused an unplanned firm load loss of at least 300MW. The dataset also provides information on geographical location of the outages, date and time of the outages, regional climatic information, land-use characteristics, electricity consumption patterns and economic characteristics of the states affected by the outages. 
 
 The initial research question I chose to center my project around is: what are the main causes of the major power outages and what are their associated characteristics? 
 
@@ -185,13 +185,13 @@ I will be testing whether the outage cause of **severe weather** affects more cu
 
 **Test Statistic:**
 - Difference of group means
-- mean(customers affected | severe weather) - mean(customers affected | other causes)
+- `mean(customers affected | severe weather) - mean(customers affected | other causes)`
 
 **Significance Level:** α = 0.05
 
 I performed a permutation test with 500 simulations in order to generate an empirical distribution of the test statistic under the null hypothesis.
 
-The p-value I got was 0.0, so with a standard significance level of 0.05, we reject the null hypothesis because the results are statistically significant. We conclude that on average, a power outage caused by severe weather will tend to affect more customers.
+The p-value I got was 0.0, so with a standard significance level of 0.05, **we reject the null hypothesis** because the results are statistically significant. We conclude that on average, a power outage caused by severe weather will tend to affect more customers.
 
 The plot below shows the observed difference against the empirical distribution of differences from the permutation tests.
 <iframe
@@ -241,12 +241,12 @@ To improve the baseline model, I made the following key changes:
 	- Used PolynomialFeatures to allow the model to capture nonlinear relationships
 
 ## Final Features Used
-After testing different feature combinations using **cross-validation**, I selected the following features:
+After testing different feature combinations using **cross-validation**, I selected the following features (same as baseline model):
 - `POPDEN_URBAN` (quantitative)
 - `ANOMALY.LEVEL` (quantitative)
 - `CAUSE.CATEGORY` (nominal categorical)
 
-Although additional features like `MONTH` and `CLIMATE.REGION` were explored, they did not significantly improve performance and were excluded to avoid unnecessary complexity.
+Although additional features like `MONTH` and `CLIMATE.REGION` were explored, they did not significantly improve performance and were excluded to avoid unnecessary complexity. The following table shows the different combinations of variables I explored and their respective RMSE (root mean squared error).
 
 | Validation Fold   |   num only |   num + cause |   num only + cause + region |   num only + cause + region + month |
 |:------------------|-----------:|--------------:|----------------------------:|------------------------------------:|
